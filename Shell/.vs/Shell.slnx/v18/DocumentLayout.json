@@ -1,12 +1,101 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\906_22\\Desktop\\SSD-Project\\Shell\\",
-  "Documents": [],
+  "WorkspaceRootPath": "C:\\Users\\906_21\\Desktop\\SSD-Project\\Shell\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{725B820C-406D-413C-893B-FA2C34380CCF}|Shell.vcxproj|C:\\Users\\906_21\\Desktop\\SSD-Project\\Shell\\Shell.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{725B820C-406D-413C-893B-FA2C34380CCF}|Shell.vcxproj|solutionrelative:Shell.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\Microsoft Visual Studio\\18\\Professional\\VC\\Tools\\MSVC\\14.50.35717\\include\\string||{3B902123-F8A7-4915-9F01-361F908088D0}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\Microsoft Visual Studio\\18\\Professional\\VC\\Tools\\MSVC\\14.50.35717\\include\\vector||{3B902123-F8A7-4915-9F01-361F908088D0}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\906_21\\AppData\\Local\\Temp\\b72b9ff0-872a-4785-b3a0-f292318de24c_Project1.zip.24c\\Project1\\Sys.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\906_21\\AppData\\Local\\Temp\\98e583f9-64d0-4354-956f-f7023342622e_Project1.zip.22e\\Project1\\Sys.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "string",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\18\\Professional\\VC\\Tools\\MSVC\\14.50.35717\\include\\string",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\18\\Professional\\VC\\Tools\\MSVC\\14.50.35717\\include\\string",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\18\\Professional\\VC\\Tools\\MSVC\\14.50.35717\\include\\string",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\18\\Professional\\VC\\Tools\\MSVC\\14.50.35717\\include\\string",
+              "ViewState": "AgIAAFkAAAAAAAAAAAAEwGoAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-03-30T02:16:27.672Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "vector",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\18\\Professional\\VC\\Tools\\MSVC\\14.50.35717\\include\\vector",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\18\\Professional\\VC\\Tools\\MSVC\\14.50.35717\\include\\vector",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\18\\Professional\\VC\\Tools\\MSVC\\14.50.35717\\include\\vector",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\18\\Professional\\VC\\Tools\\MSVC\\14.50.35717\\include\\vector",
+              "ViewState": "AgIAAHgHAAAAAAAAAAAewIkHAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-03-30T02:09:21.669Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Sys.h",
+              "DocumentMoniker": "C:\\Users\\906_21\\AppData\\Local\\Temp\\b72b9ff0-872a-4785-b3a0-f292318de24c_Project1.zip.24c\\Project1\\Sys.h",
+              "RelativeDocumentMoniker": "..\\..\\..\\AppData\\Local\\Temp\\b72b9ff0-872a-4785-b3a0-f292318de24c_Project1.zip.24c\\Project1\\Sys.h",
+              "ToolTip": "C:\\Users\\906_21\\AppData\\Local\\Temp\\b72b9ff0-872a-4785-b3a0-f292318de24c_Project1.zip.24c\\Project1\\Sys.h [\uC77D\uAE30 \uC804\uC6A9]",
+              "RelativeToolTip": "..\\..\\..\\AppData\\Local\\Temp\\b72b9ff0-872a-4785-b3a0-f292318de24c_Project1.zip.24c\\Project1\\Sys.h [\uC77D\uAE30 \uC804\uC6A9]",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAACcAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-03-30T01:28:51.48Z",
+              "EditorCaption": " [\uC77D\uAE30 \uC804\uC6A9]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Sys.cpp",
+              "DocumentMoniker": "C:\\Users\\906_21\\AppData\\Local\\Temp\\98e583f9-64d0-4354-956f-f7023342622e_Project1.zip.22e\\Project1\\Sys.cpp",
+              "RelativeDocumentMoniker": "..\\..\\..\\AppData\\Local\\Temp\\98e583f9-64d0-4354-956f-f7023342622e_Project1.zip.22e\\Project1\\Sys.cpp",
+              "ToolTip": "C:\\Users\\906_21\\AppData\\Local\\Temp\\98e583f9-64d0-4354-956f-f7023342622e_Project1.zip.22e\\Project1\\Sys.cpp [\uC77D\uAE30 \uC804\uC6A9]",
+              "RelativeToolTip": "..\\..\\..\\AppData\\Local\\Temp\\98e583f9-64d0-4354-956f-f7023342622e_Project1.zip.22e\\Project1\\Sys.cpp [\uC77D\uAE30 \uC804\uC6A9]",
+              "ViewState": "AgIAAGMAAAAAAAAAAAAAAAUAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-03-30T01:22:58.551Z",
+              "EditorCaption": " [\uC77D\uAE30 \uC804\uC6A9]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Shell.cpp",
+              "DocumentMoniker": "C:\\Users\\906_21\\Desktop\\SSD-Project\\Shell\\Shell.cpp",
+              "RelativeDocumentMoniker": "Shell.cpp",
+              "ToolTip": "C:\\Users\\906_21\\Desktop\\SSD-Project\\Shell\\Shell.cpp",
+              "RelativeToolTip": "Shell.cpp",
+              "ViewState": "AgIAAGwAAAAAAAAAAAAAAHIAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-03-30T01:10:51.394Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }
