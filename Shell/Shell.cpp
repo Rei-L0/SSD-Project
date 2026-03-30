@@ -1,8 +1,11 @@
-﻿#include <iostream>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <sstream>
-#include<algorithm>
+#include <boost/asio.hpp>
+
+using boost::asio::ip::tcp;
+
 
 class MyTeam {
 private:
@@ -59,106 +62,149 @@ int Check_Value(std::string cmd) {
 	return 1;
 }
 
+void Tcp_send(std::string msg, tcp::socket& socket) {
+	boost::asio::write(socket, boost::asio::buffer(msg));
 
+	char reply[1024];
+	size_t length = socket.read_some(boost::asio::buffer(reply));
+
+	std::cout << "Echo: "
+		<< std::string(reply, length) << std::endl;
+
+}
 
 int main() {
 	MyTeam team4;
 
-	while (true) {
-		std::cout << "team4>";
+	try {
+		boost::asio::io_context io;
 
-		std::string cmd;
-		std::getline(std::cin, cmd);
+		tcp::socket socket(io);
+		socket.connect(tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 12345));
 
-		std::stringstream ss(cmd);
-		std::vector<std::string> cmds;
-		std::string tem;
+		std::cout << "Connected to server\n";
 
-		while (std::getline(ss, tem, ' ')) {
-			if (tem != "") {
-				cmds.push_back(tem);
-			}
-		}
+		while (true) {
+			std::cout << "team4>";
 
+			std::string msg;
 
-		if (cmds[0] == "write") {
-			if (cmds.size() != 3) {
-				CMD_Error();
-				continue;
-			}
+			std::string cmd;
+			std::getline(std::cin, cmd);
 
-			int LBA = Check_LBA(cmds[1]);
-			if (LBA < 0 or 99 < LBA) {
-				Error_Out();
-				continue;
+			std::stringstream ss(cmd);
+			std::vector<std::string> cmds;
+			std::string tem;
+
+			while (std::getline(ss, tem, ' ')) {
+				if (tem != "") {
+					cmds.push_back(tem);
+				}
 			}
 
-			if (!Check_Value(cmds[2])) {
-				Error_Out();
-				continue;
+			
+
+
+			if (cmds[0] == "write") {
+				if (cmds.size() != 3) {
+					CMD_Error();
+					continue;
+				}
+
+				int LBA = Check_LBA(cmds[1]);
+				if (LBA < 0 or 99 < LBA) {
+					Error_Out();
+					continue;
+				}
+
+				if (!Check_Value(cmds[2])) {
+					Error_Out();
+					continue;
+				}
+
+				msg = "W " + cmds[1];
+				msg += " ";
+				msg += cmds[2];
+				Tcp_send(msg, socket);
+				std::cout << "SUCCESS" << std::endl;
 			}
+			else if (cmds[0] == "read") {
+				if (cmds.size() != 2) {
+					CMD_Error();
+					continue;
+				}
 
-			std::cout << "SUCCESS" << std::endl;
-		}
-		else if (cmds[0] == "read") {
-			if (cmds.size() != 2) {
-				CMD_Error();
-				continue;
+				int LBA = Check_LBA(cmds[1]);
+				if (LBA < 0 or 99 < LBA) {
+					Error_Out();
+					continue;
+				}
+
+				msg = "R " + cmds[1];
+				Tcp_send(msg, socket);
+				std::cout << "SUCCESS" << std::endl;
 			}
+			else if (cmds[0] == "exit")		return 0;
+			else if (cmds[0] == "help") 	team4.MyTeam_explaine();
+			else if (cmds[0] == "fullwrite") {
+				if (cmds.size() != 2) {
+					CMD_Error();
+					continue;
+				}
 
-			int LBA = Check_LBA(cmds[1]);
-			if (LBA < 0 or 99 < LBA) {
-				Error_Out();
-				continue;
-			}
+				if (!Check_Value(cmds[1])) {
+					Error_Out();
+					continue;
+				}
 
-			std::cout << "SUCCESS" << std::endl;
-		}
-		else if (cmds[0] == "exit")		return 0;
-		else if (cmds[0] == "help") 	team4.MyTeam_explaine();
-		else if (cmds[0] == "fullwrite") {
-			if (cmds.size() != 2) {
-				CMD_Error();
-				continue;
-			}
+				std::vector<std::string> fullwrite_tmp;
+				msg = "R ";
 
-			if (!Check_Value(cmds[1])) {
-				Error_Out();
-				continue;
-			}
-
-			std::vector<std::string> fullwrite_tmp;
-
-			for (int i = 0; i < 100; i++) {
 				//read
-				fullwrite_tmp.push_back("123");
+				for (int i = 0; i < 100; i++) {
+					Tcp_send(msg + std::to_string(i), socket);
+				}
+
+				msg = "W ";
 				//write
+				for (int i = 0; i < 100; i++) {
+					Tcp_send(msg + std::to_string(i) + " " + cmds[1], socket);
+				}
+				std::cout << "SUCCESS" << std::endl;
+
+				//롤백 구현
+
+
+
+				std::cout << "SUCCESS" << std::endl;
 			}
+			else if (cmds[0] == "fullread") {
+				if (cmds.size() != 1) {
+					CMD_Error();
+					continue;
+				}
 
-			//롤백 구현
-
-
-
-			std::cout << "SUCCESS" << std::endl;
-		}
-		else if (cmds[0] == "fullread") {
-			if (cmds.size() != 1) {
-				CMD_Error();
-				continue;
+				msg = "R ";
+				for (int i = 0; i < 100; i++) {
+					Tcp_send(msg + std::to_string(i), socket);
+				}
+				std::cout << "SUCCESS" << std::endl;
 			}
-
-
-			for (int i = 0; i < 100; i++) {
-
+			else if (cmds[0] == "test") 	return 0;
+			else if (cmds[0] == "testall") 	return 0;
+			else {
+				Error_Out();
 			}
 		}
-		else if (cmds[0] == "test") 	return 0;
-		else if (cmds[0] == "testall") 	return 0;
-		else {
-			Error_Out();
-		}
+
+
+	}
+	catch (std::exception& e) {
+		std::cerr << e.what() << std::endl;
 	}
 
+
+	
 
 
 	return 0;
