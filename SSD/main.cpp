@@ -1,66 +1,11 @@
+// server.cpp
+#include <boost/asio.hpp>
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <filesystem>
+#include <vector>
+#include "SSD.h"
 
-const int LBA_SIZE = 4;
-const int MIN_LBA_SIZE = 0;
-const int MAX_LBA_SIZE = 100;
-const int LINE_SIZE = 10;
-
-const std::string DEFALT_DATA = "00000000";
-
-const std::string FILE_NAME = "nand.txt";
-
-std::string parseValue(std::string s) {
-	return s.substr(2);
-}
-
-bool validLbaIdx(int idx) {
-	return MIN_LBA_SIZE <= idx && idx < MAX_LBA_SIZE;
-}
-
-bool validValue(std::string s) {
-
-}
-
-bool read(std::fstream& file, int idx) {
-	if (!file.is_open()) return false;
-
-	int lineNum = 0;
-	std::string s;
-	while (!file.eof()) {
-		std::getline(file, s);
-		if (lineNum == idx) { 
-			std::cout << "0x" << s << "\n";
-			break; 
-		}
-		lineNum++;
-	}
-
-	return true;
-}
-
-bool write(std::fstream& file, int idx, std::string value) {
-	if (!file.is_open()) return false;
-
-	std::string s = parseValue(value);
-
-	if (s.length() != 8) {
-		return false;
-	}
-
-	file.seekp(idx * LINE_SIZE, std::ios::beg);
-	file << s;
-	return true;
-}
-
-void init(std::ofstream &fout) {
-	for (size_t i = 0; i < MAX_LBA_SIZE; i++)
-	{
-		fout << DEFALT_DATA << "\n";
-	}
-}
+using boost::asio::ip::tcp;
 
 void printOperInputErrorMsg() {
 	std::cout << "잘못된 명령어 입력입니다.\n";
@@ -75,52 +20,88 @@ void printError() {
 }
 
 int main() {
-	if (!std::filesystem::exists(FILE_NAME)) {
-		std::ofstream fout(FILE_NAME);
-		if (fout.is_open()) {
-			init(fout);
-			std::cout << "초기화 완료\n";
+
+	try {
+		boost::asio::io_context io;
+		SSD ssd;
+
+		tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), 12345));
+
+		std::cout << "server started on port 12345\n";
+
+		while (true) {
+			tcp::socket socket(io);
+			acceptor.accept(socket);
+
+			std::cout << "client connected\n";
+
+			while (true) {
+				char data[1024];
+
+				boost::system::error_code ec;
+				size_t length = socket.read_some(boost::asio::buffer(data), ec);
+
+				if (ec == boost::asio::error::eof)
+					break; // 정상 종료
+				else if (ec)
+					throw boost::system::system_error(ec);
+
+				// echo
+
+				std::string cmd(data);
+				cmd.erase(cmd.begin() + length, cmd.end());
+				std::stringstream ss(cmd);
+				std::vector<std::string> cmds;
+
+				std::string tem;
+
+				while (std::getline(ss, tem, ' ')) {
+					if (tem != "") {
+						cmds.push_back(tem);
+					}
+				}
+
+
+				char op = data[0];
+				int lba_idx = std::stoi(cmds[1]);
+				std::string msg;
+				if (op == 'W') {
+					std::string value;
+					value = cmds[2];
+					if (!ssd.validLbaIdx(lba_idx)) {
+						printError();
+						continue;
+					}
+
+					if (ssd.write(lba_idx, value)) {
+						printSuccess();
+					}
+					else {
+						printError();
+					}
+				}
+				else if (op == 'R') {
+					if (!ssd.validLbaIdx(lba_idx)) {
+						printError();
+						continue;
+					}
+					if (ssd.read(lba_idx, msg)) {
+						strcpy_s(data, msg.c_str());
+					}
+					else {
+						printError();
+					}
+				}
+
+				boost::asio::write(socket, boost::asio::buffer(data, length));
+
+				if (op != 'W' && op != 'R')break;
+			}
+
+			std::cout << "client disconnected\n";
 		}
 	}
-
-	while (true) {
-		std::fstream file(FILE_NAME,std::ios::in|std::ios::out);
-		
-		char op = 'a';
-		int lba_idx = 0;
-		std::cin >> op >> lba_idx;
-
-		if (op == 'W') {
-			std::string value;
-			std::cin >> value;
-			if (!validLbaIdx(lba_idx)) {
-				printError();
-				continue;
-			}
-
-			if (write(file,lba_idx,value)) {
-				printSuccess();
-			}
-			else {
-				printError();
-			}
-		}
-		else if (op == 'R') {
-			if (!validLbaIdx(lba_idx)) {
-				printError();
-				continue;
-			}
-			if (read(file, lba_idx)) {
-			}
-			else {
-				printError();
-			}
-		}
-		else {
-			printOperInputErrorMsg();
-		}
-
-		file.close();
-		if (op != 'W' && op != 'R')break;
+	catch (std::exception& e) {
+		std::cerr << e.what() << std::endl;
 	}
 }

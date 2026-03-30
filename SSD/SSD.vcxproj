@@ -128,6 +128,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PrintManager.h" />
+    <ClCompile Include="SSD.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SSD.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

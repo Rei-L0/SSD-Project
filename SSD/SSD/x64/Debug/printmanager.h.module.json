@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "SSD\\x64\\Debug\\PrintManager.h.obj",
+            "outputs": [
+                "C:\\Users\\906_22\\Desktop\\SSD-Project\\SSD\\SSD\\x64\\Debug\\vc145.pdb",
+                "SSD\\x64\\Debug\\",
+                "C:\\Users\\906_22\\Desktop\\SSD-Project\\SSD\\SSD\\x64\\Debug\\PrintManager.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "PrintManager.h",
+                    "source-path": "c:\\users\\906_22\\desktop\\ssd-project\\ssd\\printmanager.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

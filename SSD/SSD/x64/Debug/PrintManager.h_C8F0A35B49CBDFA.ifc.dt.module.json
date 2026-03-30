@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "SSD\\x64\\Debug\\PrintManager.obj",
+            "outputs": [
+                "SSD\\x64\\Debug\\PrintManager.h_C8F0A35B49CBDFA.ifc.dt.module.json",
+                "SSD\\x64\\Debug\\PrintManager.h_C8F0A35B49CBDFA.ifc.dt.d.json",
+                "SSD\\x64\\Debug\\PrintManager.h.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "C:\\Users\\906_22\\Desktop\\SSD-Project\\SSD\\PrintManager.h",
+                    "source-path": "c:\\users\\906_22\\desktop\\ssd-project\\ssd\\printmanager.h",
+                    "lookup-method": "absolute"
+                }
+            ],
+            "requires": []
+        }
+    ]
+}
