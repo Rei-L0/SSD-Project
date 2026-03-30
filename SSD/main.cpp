@@ -16,7 +16,28 @@ std::string parseValue(std::string s) {
 	return s.substr(2);
 }
 
-bool read(std::fstream file, int idx) {
+bool validLbaIdx(int idx) {
+	return MIN_LBA_SIZE <= idx && idx < MAX_LBA_SIZE;
+}
+
+bool validValue(std::string s) {
+
+}
+
+bool read(std::fstream& file, int idx) {
+	if (!file.is_open()) return false;
+
+	int lineNum = 0;
+	std::string s;
+	while (!file.eof()) {
+		std::getline(file, s);
+		if (lineNum == idx) { 
+			std::cout << "0x" << s << "\n";
+			break; 
+		}
+		lineNum++;
+	}
+
 	return true;
 }
 
@@ -31,8 +52,6 @@ bool write(std::fstream& file, int idx, std::string value) {
 
 	file.seekp(idx * LINE_SIZE, std::ios::beg);
 	file << s;
-
-	file.flush();
 	return true;
 }
 
@@ -47,16 +66,12 @@ void printOperInputErrorMsg() {
 	std::cout << "잘못된 명령어 입력입니다.\n";
 }
 
-bool validLbaIdx(int idx) {
-	return MIN_LBA_SIZE <= idx && idx < MAX_LBA_SIZE;
-}
-
 void printSuccess() {
-	std::cout << "SUCCESS";
+	std::cout << "SUCCESS" << "\n";
 }
 
 void printError() {
-	std::cout << "ERROR";
+	std::cout << "ERROR" << "\n";
 }
 
 int main() {
@@ -76,12 +91,12 @@ int main() {
 		std::cin >> op >> lba_idx;
 
 		if (op == 'W') {
+			std::string value;
+			std::cin >> value;
 			if (!validLbaIdx(lba_idx)) {
 				printError();
 				continue;
 			}
-			std::string value;
-			std::cin >> value;
 
 			if (write(file,lba_idx,value)) {
 				printSuccess();
@@ -95,7 +110,11 @@ int main() {
 				printError();
 				continue;
 			}
-
+			if (read(file, lba_idx)) {
+			}
+			else {
+				printError();
+			}
 		}
 		else {
 			printOperInputErrorMsg();
