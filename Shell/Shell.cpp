@@ -3,9 +3,11 @@
 #include <vector>
 #include <sstream>
 #include <boost/asio.hpp>
+#include <fstream>
+#include <filesystem>
+#include "FileSystem.h"
 
 using boost::asio::ip::tcp;
-
 
 class MyTeam {
 private:
@@ -26,8 +28,11 @@ public:
 
 };
 
-void Error_Out() {
-	std::cout << "ERROR" << std::endl;
+void Error_Out(FS& Fs) {
+	std::string msg;
+	msg = "ERROR";
+	Fs.write(msg);
+	std::cout << msg << std::endl;
 }
 
 void CMD_Error() {
@@ -62,18 +67,17 @@ int Check_Value(std::string cmd) {
 	return 1;
 }
 
-void Tcp_send(std::string msg, tcp::socket& socket) {
+std::string Tcp_send(std::string msg, tcp::socket& socket) {
 	boost::asio::write(socket, boost::asio::buffer(msg));
 
 	char reply[1024];
 	size_t length = socket.read_some(boost::asio::buffer(reply));
 
-	std::cout << "Echo: "
-		<< std::string(reply, length) << std::endl;
-
+	return  std::string(reply, length);
 }
 
 int main() {
+	FS Fs;
 	MyTeam team4;
 
 	try {
@@ -85,12 +89,16 @@ int main() {
 		std::cout << "Connected to server\n";
 
 		while (true) {
-			std::cout << "team4>";
+			std::string shell = "team4>";
+			Fs.write(shell);
+			std::cout << shell;
 
 			std::string msg;
 
 			std::string cmd;
 			std::getline(std::cin, cmd);
+
+			Fs.write(cmd);
 
 			std::stringstream ss(cmd);
 			std::vector<std::string> cmds;
@@ -107,53 +115,61 @@ int main() {
 
 			if (cmds[0] == "write") {
 				if (cmds.size() != 3) {
-					CMD_Error();
+					Error_Out(Fs);
+					//CMD_Error();
 					continue;
 				}
 
 				int LBA = Check_LBA(cmds[1]);
 				if (LBA < 0 or 99 < LBA) {
-					Error_Out();
+					Error_Out(Fs);
 					continue;
 				}
 
 				if (!Check_Value(cmds[2])) {
-					Error_Out();
+					Error_Out(Fs);
 					continue;
 				}
 
 				msg = "W " + cmds[1];
 				msg += " ";
 				msg += cmds[2];
-				Tcp_send(msg, socket);
+				std::string reply = Tcp_send(msg, socket);
+				std::cout << reply << std::endl;
+				Fs.write(reply);
 				std::cout << "SUCCESS" << std::endl;
 			}
 			else if (cmds[0] == "read") {
 				if (cmds.size() != 2) {
-					CMD_Error();
+					Error_Out(Fs);
+					//CMD_Error();
 					continue;
 				}
 
 				int LBA = Check_LBA(cmds[1]);
 				if (LBA < 0 or 99 < LBA) {
-					Error_Out();
+					Error_Out(Fs);
 					continue;
 				}
 
 				msg = "R " + cmds[1];
-				Tcp_send(msg, socket);
+				std::string reply = Tcp_send(msg, socket);
+				reply = "0x" + reply;
+				Fs.write(reply);
+				std::cout << reply << std::endl;
 				std::cout << "SUCCESS" << std::endl;
 			}
 			else if (cmds[0] == "exit")		return 0;
 			else if (cmds[0] == "help") 	team4.MyTeam_explaine();
 			else if (cmds[0] == "fullwrite") {
 				if (cmds.size() != 2) {
-					CMD_Error();
+					Error_Out(Fs);
+					//CMD_Error();
 					continue;
 				}
 
 				if (!Check_Value(cmds[1])) {
-					Error_Out();
+					Error_Out(Fs);
 					continue;
 				}
 
@@ -167,33 +183,53 @@ int main() {
 
 				msg = "W ";
 				//write
+				std::string reply;
 				for (int i = 0; i < 100; i++) {
-					Tcp_send(msg + std::to_string(i) + " " + cmds[1], socket);
+					reply = Tcp_send(msg + std::to_string(i) + " " + cmds[1], socket);
+					if (reply == "ERROR") {
+						for (int j = 0; j < i; i++) {
+							Tcp_send(msg + std::to_string(j) + " " + cmds[1], socket);
+						}
+						break;
+					}
 				}
-				std::cout << "SUCCESS" << std::endl;
-
-				//롤백 구현
-
-
-
-				std::cout << "SUCCESS" << std::endl;
+				Fs.write(reply);
+				std::cout << reply << std::endl;
 			}
 			else if (cmds[0] == "fullread") {
 				if (cmds.size() != 1) {
-					CMD_Error();
+					Error_Out(Fs);
 					continue;
 				}
 
 				msg = "R ";
+				std::string reply;
 				for (int i = 0; i < 100; i++) {
-					Tcp_send(msg + std::to_string(i), socket);
+					reply = Tcp_send(msg + std::to_string(i), socket);
+					if (reply == "ERROR") {
+						Fs.write(reply);
+						std::cout << reply << std::endl;
+						break;
+					}
+					else {
+						reply = "LBA " + std::to_string(i) + " : 0x" + reply;
+						Fs.write(reply);
+						std::cout << reply << std::endl;
+					}
 				}
-				std::cout << "SUCCESS" << std::endl;
 			}
-			else if (cmds[0] == "test") 	return 0;
+			else if (cmds[0] == "test") {
+				if (cmds.size() != 2) {
+					Error_Out(Fs);
+					continue;
+				}
+
+
+
+			}
 			else if (cmds[0] == "testall") 	return 0;
 			else {
-				Error_Out();
+				Error_Out(Fs);
 			}
 		}
 
