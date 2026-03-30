@@ -13,7 +13,7 @@ const std::string DEFALT_DATA = "00000000";
 const std::string FILE_NAME = "nand.txt";
 
 std::string parseValue(std::string s) {
-	return s.substr(1);
+	return s.substr(2);
 }
 
 bool read(std::fstream file, int idx) {
@@ -21,8 +21,18 @@ bool read(std::fstream file, int idx) {
 }
 
 bool write(std::fstream& file, int idx, std::string value) {
-	file.seekp(idx*LINE_SIZE);
-	file << parseValue(value) << "\n";
+	if (!file.is_open()) return false;
+
+	std::string s = parseValue(value);
+
+	if (s.length() != 8) {
+		return false;
+	}
+
+	file.seekp(idx * LINE_SIZE, std::ios::beg);
+	file << s;
+
+	file.flush();
 	return true;
 }
 
@@ -59,7 +69,7 @@ int main() {
 	}
 
 	while (true) {
-		std::fstream file(FILE_NAME,std::ios::in||std::ios::out);
+		std::fstream file(FILE_NAME,std::ios::in|std::ios::out);
 		
 		char op = 'a';
 		int lba_idx = 0;
@@ -75,6 +85,9 @@ int main() {
 
 			if (write(file,lba_idx,value)) {
 				printSuccess();
+			}
+			else {
+				printError();
 			}
 		}
 		else if (op == 'R') {
