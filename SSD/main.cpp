@@ -9,8 +9,6 @@
 
 using boost::asio::ip::tcp;
 
-const std::string FILE_NAME = "output.txt";
-
 class MyTeam {
 private:
 	std::string team_name = "민코딩";
@@ -76,9 +74,6 @@ std::string Tcp_send(std::string msg, tcp::socket& socket) {
 }
 
 int main() {
-	if (!std::filesystem::exists(FILE_NAME)) {
-		std::ofstream fout(FILE_NAME);
-	}
 
 	MyTeam team4;
 
