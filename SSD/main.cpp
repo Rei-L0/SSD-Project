@@ -1,181 +1,215 @@
-// server.cpp
-#include <boost/asio.hpp>
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
+#include <sstream>
+#include <boost/asio.hpp>
+#include <fstream>
 #include <filesystem>
-#include <algorithm>
+#include "FileSystem.h"
 
 using boost::asio::ip::tcp;
 
-const int lba_size = 4;
-const int min_lba_size = 0;
-const int max_lba_size = 100;
-const int line_size = 10;
+const std::string FILE_NAME = "output.txt";
 
-const std::string defalt_data = "00000000";
+class MyTeam {
+private:
+	std::string team_name = "민코딩";
+	std::string teamone1_name = "심동현";
+	std::string teamone2_name = "박연후";
+	std::string myeonglyeong = R"(
+	각 명령어 사용법
+	알아서 잘 쓰세요
+)";
 
-const std::string file_name = "nand.txt";
+public:
+	void MyTeam_explaine() {
+		std::cout << "팀이름 : " << team_name << std::endl;
+		std::cout << "팀 원 : " << teamone1_name << ", " << teamone2_name << std::endl;
+		std::cout << "팀이름 : " << myeonglyeong << std::endl;
+	}
 
-std::string parsevalue(std::string s) {
-	return s.substr(2);
+};
+
+void Error_Out() {
+	std::cout << "ERROR" << std::endl;
 }
 
-bool validlbaidx(int idx) {
-	return min_lba_size <= idx && idx < max_lba_size;
+void CMD_Error() {
+	std::cout << "명령어 인자 갯수 에러" << std::endl;
 }
 
-bool read(std::fstream& file, int idx, std::string& msg) {
-	if (!file.is_open()) return false;
+int Check_LBA(std::string cmd) {
+	if (cmd.size() > 2)return -1;
+	if (cmd[0] < '0' or cmd[0]>'9') return -1;
+	if (cmd.size() == 2) {
+		if (cmd[1] < '0' or cmd[1]>'9') return -1;
+		if (cmd[0] == '0')return-1;
+	}
+	return std::stoi(cmd);
+}
 
-	int linenum = 0;
-	std::string s;
-	while (!file.eof()) {
-		std::getline(file, s);
-		if (linenum == idx) {
-			std::cout << "0x" << s << "\n";
-			break;
+int Check_Value(std::string cmd) {
+	if (cmd.size() != 10) {
+		std::cout << "밸류 값 자릿수 에러"<<std::endl;
+		return 0;
+	}
+		
+	if(cmd[0] != '0' or cmd[1] != 'x') {
+		std::cout << "Value 자료형 표현 에러"<<std::endl;
+		return 0;
+	}
+	for (int i = 2; i < cmd.size(); i++) {
+		if (!((cmd[i] >= '0' and cmd[i] <= '9') or (cmd[i] >= 'a' and cmd[i] <= 'f'))) {
+			std::cout << "Value 값 범위 에러"; return 0;
 		}
-		linenum++;
 	}
-	msg = s;
-	return true;
+	return 1;
 }
 
-bool write(std::fstream& file, int idx, std::string value) {
-	if (!file.is_open()) return false;
+std::string Tcp_send(std::string msg, tcp::socket& socket) {
+	boost::asio::write(socket, boost::asio::buffer(msg));
 
-	std::string s = parsevalue(value);
+	char reply[1024];
+	size_t length = socket.read_some(boost::asio::buffer(reply));
 
-	if (s.length() != 8) {
-		return false;
-	}
-
-	file.seekp(idx * line_size, std::ios::beg);
-	file << s;
-	return true;
-}
-
-void init(std::ofstream& fout) {
-	for (size_t i = 0; i < max_lba_size; i++)
-	{
-		fout << defalt_data << "\n";
-	}
-}
-
-void printoperinputerrormsg() {
-	std::cout << "잘못된 명령어 입력입니다.\n";
-}
-
-void printsuccess() {
-	std::cout << "success" << "\n";
-}
-
-void printerror() {
-	std::cout << "error" << "\n";
+	return  std::string(reply, length);
 }
 
 int main() {
-	if (!std::filesystem::exists(file_name)) {
-		std::ofstream fout(file_name);
-		if (fout.is_open()) {
-			init(fout);
-			std::cout << "초기화 완료\n";
-		}
+	if (!std::filesystem::exists(FILE_NAME)) {
+		std::ofstream fout(FILE_NAME);
 	}
 
+	MyTeam team4;
 
 	try {
 		boost::asio::io_context io;
 
-		tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), 12345));
+		tcp::socket socket(io);
+		socket.connect(tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 12345));
 
-		std::cout << "server started on port 12345\n";
+		std::cout << "Connected to server\n";
 
 		while (true) {
-			tcp::socket socket(io);
-			acceptor.accept(socket);
+			std::cout << "team4>";
 
-			std::cout << "client connected\n";
+			std::string msg;
 
-			while (true) {
-				char data[1024];
+			std::string cmd;
+			std::getline(std::cin, cmd);
 
-				boost::system::error_code ec;
-				size_t length = socket.read_some(boost::asio::buffer(data), ec);
+			std::stringstream ss(cmd);
+			std::vector<std::string> cmds;
+			std::string tem;
 
-				if (ec == boost::asio::error::eof)
-					break; // 정상 종료
-				else if (ec)
-					throw boost::system::system_error(ec);
-
-				// echo
-				
-
-
-				std::fstream file(file_name, std::ios::in | std::ios::out);
-
-
-
-				std::string cmd(data);
-				cmd.erase(cmd.begin()+length, cmd.end());
-				std::stringstream ss(cmd);
-				std::vector<std::string> cmds;
-
-				std::string tem;
-
-				while (std::getline(ss, tem, ' ')) {
-					if (tem != "") {
-						cmds.push_back(tem);
-					}
+			while (std::getline(ss, tem, ' ')) {
+				if (tem != "") {
+					cmds.push_back(tem);
 				}
-
-
-				char op = data[0];
-				int lba_idx = std::stoi(cmds[1]);
-				//std::cin >> op >> lba_idx;
-				std::string msg;
-				if (op == 'W') {
-					std::string value;
-					value = cmds[2];
-					if (!validlbaidx(lba_idx)) {
-						printerror();
-						continue;
-					}
-
-					if (write(file, lba_idx, value)) {
-						printsuccess();
-					}
-					else {
-						printerror();
-					}
-				}
-				else if (op == 'R') {
-					if (!validlbaidx(lba_idx)) {
-						printerror();
-						continue;
-					}
-					if (read(file, lba_idx,msg)) {
-						strcpy(data,msg.c_str());
-					}
-					else {
-						printerror();
-					}
-				}
-				else {
-					printoperinputerrormsg();
-				}
-
-				file.close();
-				
-				boost::asio::write(socket, boost::asio::buffer(data, length));
-
-				if (op != 'W' && op != 'R')break;
 			}
 
-			std::cout << "client disconnected\n";
+			
+
+
+			if (cmds[0] == "write") {
+				if (cmds.size() != 3) {
+					CMD_Error();
+					continue;
+				}
+
+				int LBA = Check_LBA(cmds[1]);
+				if (LBA < 0 or 99 < LBA) {
+					Error_Out();
+					continue;
+				}
+
+				if (!Check_Value(cmds[2])) {
+					Error_Out();
+					continue;
+				}
+
+				msg = "W " + cmds[1];
+				msg += " ";
+				msg += cmds[2];
+				std::cout << Tcp_send(msg, socket) << std::endl;
+				std::cout << "SUCCESS" << std::endl;
+			}
+			else if (cmds[0] == "read") {
+				if (cmds.size() != 2) {
+					CMD_Error();
+					continue;
+				}
+
+				int LBA = Check_LBA(cmds[1]);
+				if (LBA < 0 or 99 < LBA) {
+					Error_Out();
+					continue;
+				}
+
+				msg = "R " + cmds[1];
+				std::cout << "0x" << Tcp_send(msg, socket) << std::endl;
+				std::cout << "SUCCESS" << std::endl;
+			}
+			else if (cmds[0] == "exit")		return 0;
+			else if (cmds[0] == "help") 	team4.MyTeam_explaine();
+			else if (cmds[0] == "fullwrite") {
+				if (cmds.size() != 2) {
+					CMD_Error();
+					continue;
+				}
+
+				if (!Check_Value(cmds[1])) {
+					Error_Out();
+					continue;
+				}
+
+				std::vector<std::string> fullwrite_tmp;
+				msg = "R ";
+
+				//read
+				for (int i = 0; i < 100; i++) {
+					Tcp_send(msg + std::to_string(i), socket);
+				}
+
+				msg = "W ";
+				//write
+				std::string reply;
+				for (int i = 0; i < 100; i++) {
+					reply = Tcp_send(msg + std::to_string(i) + " " + cmds[1], socket);
+					if (reply == "ERROR") {
+						for (int j = 0; j < i; i++) {
+							Tcp_send(msg + std::to_string(j) + " " + cmds[1], socket);
+						}
+						break;
+					}
+				}
+				std::cout << reply << std::endl;
+			}
+			else if (cmds[0] == "fullread") {
+				if (cmds.size() != 1) {
+					CMD_Error();
+					continue;
+				}
+
+				msg = "R ";
+				std::string reply;
+				for (int i = 0; i < 100; i++) {
+					reply = Tcp_send(msg + std::to_string(i), socket);
+					if (reply == "ERROR") {
+						std::cout << reply << std::endl;
+						break;
+					}
+					else std::cout << "LBA " << i << " : 0x" << reply  << std::endl;
+				}
+			}
+			else if (cmds[0] == "test") 	return 0;
+			else if (cmds[0] == "testall") 	return 0;
+			else {
+				Error_Out();
+			}
 		}
+
+
 	}
 	catch (std::exception& e) {
 		std::cerr << e.what() << std::endl;
@@ -183,4 +217,7 @@ int main() {
 
 
 	
+
+
+	return 0;
 }
